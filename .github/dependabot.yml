@@ -1,0 +1,252 @@
+# To get # .github/dependabot.yml
+#
+# Dependabot configuration for the Veriflow monorepo.
+#
+# Dependabot works by reading your package manifests (package.json,
+# requirements.txt, Dockerfile, etc.) on a schedule and opening pull
+# requests whenever it finds a newer version of a dependency. Each
+# entry in the `updates` list below targets one package ecosystem
+# in one directory. Because Veriflow is a monorepo, we need a
+# separate entry for each app/package that has its own manifest.
+#
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configura
+version: 2
+updates:
+# ──────────────────────────────────────────────────────────────────
+# 1. Next.js Frontend + Marketing Site
+# Manifest: apps/web/package.json
+# Covers: React, Next.js, Tailwind, shadcn/ui, react-pdf, etc.
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "npm"
+directory: "/apps/web"
+schedule:
+interval: "weekly"
+day: "monday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+# Keep PRs manageable — group all non-breaking updates into one PR
+# per dependency type so your feed isn't flooded.
+groups:
+# All React and Next.js related packages in one PR
+nextjs-react:
+patterns:
+- "next"
+- "react"
+- "react-dom"
+- "@types/react*"
+# All UI / styling packages in one PR
+ui-and-styling:
+patterns:
+- "tailwindcss"
+- "@tailwindcss/*"
+- "shadcn*"
+- "@radix-ui/*"
+- "lucide-react"
+- "clsx"
+- "tailwind-merge"
+# PDF viewer dependencies together
+pdf-viewer:
+patterns:
+- "react-pdf"
+- "@react-pdf/*"
+- "pdfjs-dist"
+# Open a maximum of 10 PRs at once so the queue stays actionable.
+open-pull-requests-limit: 10
+labels:
+- "dependencies"
+- "frontend"
+commit-message:
+prefix: "chore(web)"
+# ──────────────────────────────────────────────────────────────────
+# 2. Node.js API Server
+# Manifest: apps/api/package.json
+# Covers: Fastify/Express, BullMQ, Prisma, Stripe, auth, etc.
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "npm"
+directory: "/apps/api"
+schedule:
+interval: "weekly"
+day: "monday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+groups:
+# Prisma ORM — keep the client and CLI version in lockstep
+prisma:
+patterns:
+- "prisma"
+- "@prisma/client"
+# Job queue and caching layer together
+queue-and-cache:
+patterns:
+- "bullmq"
+- "ioredis"
+- "@upstash/*"
+# Stripe billing SDK
+billing:
+patterns:
+- "stripe"
+# Auth and security libraries
+auth-and-security:
+patterns:
+- "lucia"
+- "jose"
+- "@lucia-auth/*"
+# OCR processing dependencies
+ocr-processing:
+patterns:
+- "tesseract.js"
+- "node-paddleocr"
+- "pdfjs-dist"
+open-pull-requests-limit: 10
+labels:
+- "dependencies"
+- "backend"
+commit-message:
+prefix: "chore(api)"
+# Security updates bypass the open PR limit and are always created
+# immediately — critical for a platform handling PHI and payment data.
+# ──────────────────────────────────────────────────────────────────
+# 3. JavaScript SDK (public: veriflow-sdk-js)
+# Manifest: packages/sdk-js/package.json
+# Covers: the public client library shipped to npm consumers
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "npm"
+directory: "/packages/sdk-js"
+schedule:
+interval: "weekly"
+day: "tuesday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+open-pull-requests-limit: 5
+labels:
+- "dependencies"
+- "sdk"
+- "javascript"
+commit-message:
+prefix: "chore(sdk-js)"
+# Ignore major version bumps automatically — SDK consumers pin to
+# a major version and we don't want to silently break their builds.
+ignore:
+- dependency-name: "*"
+update-types: ["version-update:semver-major"]
+# ──────────────────────────────────────────────────────────────────
+# 4. Python SDK (public: veriflow-sdk-py)
+# Manifest: packages/sdk-py/requirements.txt (or pyproject.toml)
+# Covers: httpx, pydantic, etc.
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "pip"
+directory: "/packages/sdk-py"
+schedule:
+interval: "weekly"
+day: "tuesday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+open-pull-requests-limit: 5
+labels:
+- "dependencies"
+- "sdk"
+- "python"
+commit-message:
+prefix: "chore(sdk-py)"
+# Same major-version protection as the JS SDK.
+ignore:
+- dependency-name: "*"
+update-types: ["version-update:semver-major"]
+# ──────────────────────────────────────────────────────────────────
+# 5. Shared TypeScript Types Package
+# Manifest: packages/shared-types/package.json
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "npm"
+directory: "/packages/shared-types"
+schedule:
+interval: "weekly"
+day: "monday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+open-pull-requests-limit: 5
+labels:
+- "dependencies"
+- "types"
+commit-message:
+prefix: "chore(shared-types)"
+# ──────────────────────────────────────────────────────────────────
+# 6. Docker — API Service
+# Manifest: apps/api/Dockerfile
+# Keeps the base Node.js image and any FROM layers up to date.
+# Important for security: OS-level CVEs live in base images.
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "docker"
+directory: "/apps/api"
+schedule:
+interval: "weekly"
+day: "wednesday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+open-pull-requests-limit: 3
+labels:
+- "dependencies"
+- "docker"
+- "infrastructure"
+commit-message:
+prefix: "chore(docker)"
+# ──────────────────────────────────────────────────────────────────
+# 7. Docker — Local Dev Stack (docker-compose.yml)
+# Manifest: infra/docker-compose.yml
+# Covers: postgres, redis, minio service images used in local dev.
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "docker"
+directory: "/infra"
+schedule:
+interval: "monthly" # Local dev images are lower urgency
+day: "wednesday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+open-pull-requests-limit: 3
+labels:
+- "dependencies"
+- "docker"
+- "dev-environment"
+commit-message:
+prefix: "chore(infra)"
+# ──────────────────────────────────────────────────────────────────
+# 8. GitHub Actions Workflows
+# Directory: .github/workflows/
+# Keeps all actions/* versions current (e.g. actions/checkout,
+# actions/setup-node, vercel/action, etc.).
+# This matters for security — a compromised action at a pinned
+# SHA you never update is a supply chain risk.
+# ──────────────────────────────────────────────────────────────────
+- package-ecosystem: "github-actions"
+directory: "/" # GitHub Actions are always found from root
+schedule:
+interval: "weekly"
+day: "thursday"
+time: "06:00"
+timezone: "America/Los_Angeles"
+open-pull-requests-limit: 5
+labels:
+- "dependencies"
+- "ci-cd"
+- "github-actions"
+commit-message:
+prefix: "chore(actions)"
+groups:
+# Group all official GitHub actions together into one PR
+github-official-actions:
+patterns:
+- "actions/*"
+# Group all Vercel/deployment actions
+deployment-actions:
+patterns:
+- "vercel/*"
+- "amondnet/vercel-action" with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  - package-ecosystem: "" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
