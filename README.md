@@ -38,7 +38,8 @@ ETHOS_AEGIS/
 ├── setup.py
 └── README.md
 ```
-https://raw.githubusercontent.com/deontewatts/REPOSITORY/main/PATH/TO/FILE
+<img width="2048" height="2048" alt="image" src="https://github.com/user-attachments/assets/e9436bfa-909b-4d8b-b3f1-bd2d7c7553e1" />
+
 
 ---
 
