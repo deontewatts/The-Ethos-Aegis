@@ -124,6 +124,7 @@ print(verdict.axiological_report)
 report = vitality.health_report()
 print(report.render())
 ```
+![image](https://github.com/user-attachments/assets/e5ba4e44-3f73-4342-b9d8-3c6e2e904c03)
 
 ### With the Security Layer
 
