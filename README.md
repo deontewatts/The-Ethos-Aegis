@@ -38,6 +38,7 @@ ETHOS_AEGIS/
 ├── setup.py
 └── README.md
 ```
+https://raw.githubusercontent.com/deontewatts/REPOSITORY/main/PATH/TO/FILE
 
 ---
 
