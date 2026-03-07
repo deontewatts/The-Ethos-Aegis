@@ -1,0 +1,8 @@
+OPENAI_API_KEY.txt
+*.env
+.env*
+secrets.txt
+*_KEY.txt
+*_SECRET.txt
+.ai-agent/
+.ai-agent/
